@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+.table-style {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 15px;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+.table-style td, .table-style th {
+    border: 1px dashed #073c55;
+    padding: 8px;
+}
+.table-style tr:nth-child(even) {
+    background-color: #070717;
+}
+
+.linha-table:hover {
+    background-color: #073c55;
+    color: #fff3f6;
+    transition: background-color 0.3s ease-in-out;
+    transition: font-family 0.3s ease-in-out;
+    font-size: 15px;
+    font-weight: 600;    
+}
+
+.table-style th {
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 15px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #070717;
+    color: rgb(237, 239, 255);
+}
+
+.positivo {
+    color: #00FF00;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 15px;    
+}
+.negativo {
+    color: #FF0000;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 15px;    
+}
+
+.positivo:hover {
+    background-color: #015719;
+    transition: background-color 0.5s ease;
+    color: whitesmoke;
+    transition: color 0.5s ease;
+    font-size: 16px;
+}
+
+.negativo:hover {
+    background-color: #e2332c;
+    transition: background-color 0.5s ease;
+    color: black;
+    transition: color 0.5s ease;
+    font-size: 16px; 
+}
+
+.dn {
+    text-align: center;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 18px;    
+    margin: 20px 20px 0px;
+    padding: 20px;
+    border: 1px solid #073c55;
+    background-color: #070717;
+}
+
+.dn:hover {
+    transition: color 0.3s ease-in-out;
+    border: 1px ridge #ffffff;
+    transition: border 0.3s ease-in-out;
+}
+
+
+.dnH3 {
+    text-align: center;
+    font-family: "Arial Black", Arial, sans-serif;
+    font-size: 30px;    
+    margin: 10px 0px 10px 0px;
+    padding: 10px;
+    border: 3px ridge #ffffff;
+    background-color: #070720;
+}
+
+.dnH3:hover {
+    color: #ffffff;
+    transition: color 0.3s ease-in-out;
+    border: 3px ridge #ffffff;
+    transition: border 0.2s ease-in-out;
+    background-color: #070717;
+    transition: background-color 0.3s ease-in-out;
+}
+
+
+.table-dn { /* Tabela */
+    font-family: "Roboto", Arial, sans-serif;
+    border-collapse: collapse;
+    width: 85%;
+    text-align: center;
+    margin: auto;
+}
+.table-dn td, .table-dn th { /* Linhas, colunas */
+    border: 1px solid #073c55;
+    padding: 2px 1px;
+}
+
+.table-dn td {
+    font-size: auto;
+}
+
+.table-dn:hover { /* Ao passar o mouse */
+    background-color: #073c55;
+    transition: background-color 0.3s ease-in-out;
+    transition: font-family 0.3s ease-in-out;
+    font-weight: 600;    
+    font-size: auto;
+}
+
+.table-dn th { /* Cabeçalho */
+    font-size: 10px;
+    text-align: center;
+    background-color: #070717;
+}

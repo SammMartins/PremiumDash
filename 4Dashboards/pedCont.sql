@@ -1,0 +1,24 @@
+WITH 
+BLOQUEIOSTOT as 
+(SELECT COUNT(DISTINCT(a.NUMPED)) - 2 "Nº TOTAL de BLOQUEIOS"
+FROM PONTUAL.pcpedi a
+WHERE a.codusur in (140, 141, 142, 143, 145, 148, 150, 151, 152, 153, 155, 
+                    156,157, 158, 161, 164, 167, 168, 169, 170, 172, 174,161, 2, 160, 9)
+and  (SYSDATE - a.DATA < 6) AND a.posicao Like 'B' OR a.posicao Like 'P'),
+    
+PENDENTES AS 
+(SELECT COUNT(DISTINCT(a.NUMPED))"Nº de PENDENTES"
+FROM PONTUAL.pcpedi a
+WHERE a.codusur in (140, 141, 142, 143, 145, 148, 150, 151, 152, 153, 155, 
+                    156,157, 158, 161, 164, 167, 168, 169, 170, 172, 174,161, 2, 160, 9)
+and  (SYSDATE - a.DATA < 6) AND a.posicao Like 'P'),
+
+BLOQUEDOS AS 
+(SELECT COUNT(DISTINCT(a.NUMPED))"Nº de BLOQUEADOS"
+FROM PONTUAL.pcpedi a
+WHERE a.codusur in (140, 141, 142, 143, 145, 148, 150, 151, 152, 153, 155, 
+                    156,157, 158, 161, 164, 167, 168, 169, 170, 172, 174,161, 2, 160, 9)
+and  (SYSDATE - a.DATA < 6) AND a.posicao Like 'B')
+    
+SELECT * 
+FROM BLOQUEDOS,PENDENTES,BLOQUEIOSTOT
