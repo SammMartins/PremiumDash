@@ -3,9 +3,9 @@ Plataforma de Inteligência de Negócios (BI) 📊
 
 
 # 💻 Tecnologias
-![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![STREAMLIT](https://img.shields.io/badge/streamlit-%23D42029.svg?style=for-the-badge&logo=streamlit&logoColor=white) ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) ![Plotly](https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![STREAMLIT](https://img.shields.io/badge/streamlit-%23D42029.svg?style=for-the-badge&logo=streamlit&logoColor=white) ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white) ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) ![Plotly](https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white) ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 
-# Descrição do projeto
+# Proposta do projeto
 Objetivo primário era migrar o BI da Premium Distribuidora, para uma "plataforma gratuita" com relatórios personalizados e de interface intuitiva, moderna e responsiva para acessos por dispositivos móveis. Antes do execução desse projeto, era utilizado uma ferramenta paga, mas que não entregava tudo o que a empresa necessitava.
 
 Nesse projeto, pude unir meus conhecimentos em consultas SQL, administração de servidores Linux, desenvolvimento em Python, análise e ciência de dados em uma plataforma pensada para facilitar a tomada de decisões da empresa.
