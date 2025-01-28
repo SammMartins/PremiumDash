@@ -224,6 +224,7 @@ AND
 AND
     (P.CODUSUR1 NOT IN (10, 2, 160, 50))
 ------------------------------------------------------------------------------------------------------------------
+/* Inativado
 UNION ALL
 SELECT 
     P.CODCLI || '' AS CLIENTE,
@@ -237,7 +238,7 @@ WHERE
     P.IEENT LIKE '0%'
 AND
     P.DTEXCLUSAO IS NULL
-
+*/
 
 
 ----------------------------
