@@ -26,7 +26,7 @@ from dataset import (df1, df2, df3, df4, diasUteis, diasDecorridos, flash322RCA,
                      top100Cli, top100Cli_comparativo, metaCalc, metaSupCalc, verbas, trocaRCA, top10CliRCA, 
                      pedErro, devolucao, campanhaDanone, inad, pedCont, estoque266, qtdVendaProd, prodSemVenda, 
                      cliente_semVenda, pedidoVsEstoque, campanhaYoPRO, ceps, cortesEquipe, cortesFornec, campanhaGulao,
-                     inadimplenciaSup, nomesRCA, nomesFornec, nomesSup)
+                     inadimplenciaSup, nomesRCA, nomesFornec, nomesSup, mix_ideal_dn)
 from grafic import  gerar_graficoVendas
 from utils import   (format_number, data_semana_ini, data_semana_fim, getTableXls, getTablePdf, get_coords_from_cep, 
                      format_currency, format_date_value)
@@ -419,9 +419,72 @@ if st.session_state['active_tab'] == ':bar_chart: FLASH':
 
         with st.spinner('Carregando dados...'):  # Pode gerar erro de recarregar todos os elemntos novamente. Usar em tabelas ou gráificos apenas.  # Pode gerar erro de recarregar todos os elemntos novamente. Usar em tabelas ou gráificos apenas.
             tm.sleep(2)
-            aba2_1, aba2_2, aba2_3 = st.tabs([":bar_chart: :red[Gerencial - Inativo]", ":male-office-worker: :blue[Supervisor]", ":man: :green[Vendedor]"])
+            aba2_1, aba2_2, aba2_3, mix = st.tabs([":bar_chart: :red[Gerencial - Inativo]", ":male-office-worker: :blue[Supervisor]", ":man: :green[Vendedor]", ":material/shopping_basket: CESTA DE PRODUTOS"])
             dias_uteis_result = str(diasUteis()).split()[-1]
             dias_decor_result = str(diasDecorridos()).split()[-1]
+        # -------------------------------- Mix de Produtos -------------------------------- # -------------------------------- #
+        with mix:
+            st.title(":material/shopping_basket: CESTA DE PRODUTOS", anchor = False)
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col1:
+                vendedorName = st.selectbox(":man: VENDEDOR", ("LEONARDO", "EDNALDO", "VAGNER", "DEIVID", "BISMARCK", "LUCIANA", "MATHEUS", "MARCIO", "LEANDRO", "REGINALDO", "ROBSON", "JOAO", "TAYANE", "MURILO", "LUCAS", "DEYVISON", "ZEFERINO", "EPAMINONDAS", "GLAUBER", "TARCISIO", "THIAGO", "FILIPE", "ROMILSON", "VALDEME"), index=0, key='cesta_rca', help="Selecione o vendedor", placeholder=":man: Escolha um Vendedor", label_visibility="visible")
+                if vendedorName == "LEONARDO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (140,),index=0, key='cesta_140', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "EDNALDO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (141,),index=0, key='cesta_141', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "VAGNER":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (142,),index=0, key='cesta_142', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "DEIVID":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (143,),index=0, key='cesta_143', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "BISMARCK":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (145,),index=0, key='cesta_145', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "LUCIANA":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (147,),index=0, key='cesta_147', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "MATHEUS":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (148,),index=0, key='cesta_148', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "MARCIO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (150,),index=0, key='cesta_150', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "LEANDRO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (151,),index=0, key='cesta_151', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "REGINALDO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (152,),index=0, key='cesta_152', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "ROBSON":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (153,),index=0, key='cesta_153', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "JOAO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (154,),index=0, key='cesta_154', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "TAYANE":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (155,),index=0, key='cesta_155', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "MURILO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (156,),index=0, key='cesta_156', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "LUCAS":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (157,),index=0, key='cesta_157', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "DEYVISON":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (158,),index=0, key='cesta_158', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "ZEFERINO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (161,),index=0, key='cesta_161', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "EPAMINONDAS":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (164,),index=0, key='cesta_164', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "GLAUBER":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (167,),index=0, key='cesta_167', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "MATEUS":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (168,),index=0, key='cesta_168', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "THIAGO":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (169,),index=0, key='cesta_169', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "FILIPE":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (170,),index=0, key='cesta_170', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "ROMILSON":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (172,),index=0, key='cesta_172', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                elif vendedorName == "VALDEME":
+                    vendedorCod = st.selectbox(":desktop_computer: CÓDIGO WINTHOR", (174,),index=0, key='cesta_174', help="Código RCA preenchido com base no nome selecionado acima", placeholder="", disabled=True, label_visibility="visible")
+                else:
+                    vendedorCod = st.selectbox("ERRO", (999,),index=0, key='cesta_0', help="ERRO: CONTATO O SUPORTE DE TI", placeholder="", disabled=True, label_visibility="visible")
+
+                carregar_cesta = st.button("CARREGAR CESTA", key="carregar_cesta")
+                if carregar_cesta:
+                    st.session_state['dn_danone_vendedor'] = mix_ideal_dn(vendedorCod)
+                    st.write(st.session_state['dn_danone_vendedor'])
+
+
         # -------------------------------- GERENCIAL -------------------------------- # -------------------------------- #
         with aba2_1:
             st.title(":building_construction: :red[Painel em construção]", anchor = False)
