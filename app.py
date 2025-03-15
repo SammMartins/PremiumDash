@@ -16,6 +16,8 @@ import pandas as pd
 import streamlit as st
 from st_keyup import st_keyup # Módulo para capturar eventos de teclado
 from streamlit_extras.stylable_container import stylable_container # Módulo para estilizar os containers
+from streamlit_extras.metric_cards import style_metric_cards
+from streamlit_extras.colored_header import colored_header
 import locale
 import bleach 
 
@@ -26,7 +28,7 @@ from dataset import (df1, df2, df3, df4, diasUteis, diasDecorridos, flash322RCA,
                      top100Cli, top100Cli_comparativo, metaCalc, metaSupCalc, verbas, trocaRCA, top10CliRCA, 
                      pedErro, devolucao, campanhaDanone, inad, pedCont, estoque266, qtdVendaProd, prodSemVenda, 
                      cliente_semVenda, pedidoVsEstoque, campanhaYoPRO, ceps, cortesEquipe, cortesFornec, campanhaGulao,
-                     inadimplenciaSup, nomesRCA, nomesFornec, nomesSup, mix_ideal_dn)
+                     inadimplenciaSup, nomesRCA, nomesFornec, nomesSup, mix_ideal_dn, mix_ideal_listaCli_listaSku)
 from grafic import  gerar_graficoVendas
 from utils import   (format_number, data_semana_ini, data_semana_fim, getTableXls, getTablePdf, get_coords_from_cep, 
                      format_currency, format_date_value)
@@ -419,13 +421,13 @@ if st.session_state['active_tab'] == ':bar_chart: FLASH':
 
         with st.spinner('Carregando dados...'):  # Pode gerar erro de recarregar todos os elemntos novamente. Usar em tabelas ou gráificos apenas.  # Pode gerar erro de recarregar todos os elemntos novamente. Usar em tabelas ou gráificos apenas.
             tm.sleep(2)
-            aba2_1, aba2_2, aba2_3, mix = st.tabs([":bar_chart: :red[Gerencial - Inativo]", ":male-office-worker: :blue[Supervisor]", ":man: :green[Vendedor]", ":material/shopping_basket: CESTA DE PRODUTOS"])
+            aba2_1, aba2_2, aba2_3, mix = st.tabs([":bar_chart: :red[Gerencial - Inativo]", ":male-office-worker: :blue[Supervisor]", ":man: :green[Vendedor]", ":material/shopping_basket: CAMPEÕES DE VENDA DANONE"])
             dias_uteis_result = str(diasUteis()).split()[-1]
             dias_decor_result = str(diasDecorridos()).split()[-1]
         # -------------------------------- Mix de Produtos -------------------------------- # -------------------------------- #
         with mix:
-            st.title(":material/shopping_basket: CESTA DE PRODUTOS", anchor = False)
-            col1, col2, col3 = st.columns([1, 1, 1])
+            st.title(":material/shopping_basket: CAMPEÕES DE VENDA DANONE", anchor = False)
+            col1, col2 = st.columns([1, 3])
             with col1:
                 vendedorName = st.selectbox(":man: VENDEDOR", ("LEONARDO", "EDNALDO", "VAGNER", "DEIVID", "BISMARCK", "LUCIANA", "MATHEUS", "MARCIO", "LEANDRO", "REGINALDO", "ROBSON", "JOAO", "TAYANE", "MURILO", "LUCAS", "DEYVISON", "ZEFERINO", "EPAMINONDAS", "GLAUBER", "TARCISIO", "THIAGO", "FILIPE", "ROMILSON", "VALDEME"), index=0, key='cesta_rca', help="Selecione o vendedor", placeholder=":man: Escolha um Vendedor", label_visibility="visible")
                 if vendedorName == "LEONARDO":
@@ -479,11 +481,223 @@ if st.session_state['active_tab'] == ':bar_chart: FLASH':
                 else:
                     vendedorCod = st.selectbox("ERRO", (999,),index=0, key='cesta_0', help="ERRO: CONTATO O SUPORTE DE TI", placeholder="", disabled=True, label_visibility="visible")
 
-                carregar_cesta = st.button("CARREGAR CESTA", key="carregar_cesta")
-                if carregar_cesta:
-                    st.session_state['dn_danone_vendedor'] = mix_ideal_dn(vendedorCod)
-                    st.write(st.session_state['dn_danone_vendedor'])
+                carregar_cesta = st.button("CARREGAR", key="carregar_cesta", use_container_width=True)
+            
+            if carregar_cesta:
+                st.markdown("<br><br>", unsafe_allow_html=True)
+                resultado_mix_ideal_dn = mix_ideal_dn(vendedorCod)
+               
+                resultado_mix_ideal_dn = resultado_mix_ideal_dn[0][0]  
 
+                
+                colored_header(
+                    label="CESTA DE PRODUTOS",
+                    description=f"INDICES PARA O MIX IDEAL DE PRODUTOS - {vendedorName}",
+                    color_name="light-blue-70",
+                )
+
+                st.session_state['dn_danone_vendedor'] = int(resultado_mix_ideal_dn) 
+
+
+                if st.session_state['dn_danone_vendedor'] == 0:
+                    st.error(":material/error: Sem dados para exibir")
+                else:
+                    left1, center1, right1 = st.columns([1, 1, 1])
+
+                    with left1:
+                        #center_left, center_center, center_right = st.columns([1, 1, 1])
+
+                        st.metric(label="CLIENTES DE DANONE NO MÊS", value=st.session_state['dn_danone_vendedor'], delta=f"100%", delta_color="off")
+                        
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)     
+                        
+                    st.divider()
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    resultado_lista = mix_ideal_listaCli_listaSku(vendedorCod)
+
+                    resultado_lista = resultado_lista.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]].rename(columns={
+                        0: "RCA",
+                        1: "VENDEDOR",
+                        2: "CODCLI",
+                        3: "CLIENTE",
+                        4: "FANTASIA",
+                        5: "MUNICIPIO",
+                        6: "MIX ATENDIDO",
+                        7: "ACTIVIA 150G AMEIXA - 17528 - 50%",
+                        8: "POLPA KIDS MORANGO - 18157 - 50%",
+                        9: "DHO P/ LEVAR MORANGO - 17507 - 70%",
+                        10: "DANONINHO 80G MORANGO - 17506 - 50%",
+                        11: "ACTIVIA 800G AMEIXA E MORANGO - 18446 / 18447 - 50%",
+                        12: "DANONINHO MULTI 320G - 17462 - 50%",
+                        13: "DANONINHO P/ BEBER 100G MORANGO - 17507 - 50%",
+                        14: "DANONE VD 170G MORANGO - 17517 - 50%",
+                        15: "DANETTE SOBREMESA CHOC 90G - 18035 - 50%",
+                        16: "YOPRO UHT CHOCOLATE - 17885 - 50%",
+                        17: "YOPRO LIQ 250G MORANGO - 17932 - 50%",
+                        18: "DANONE MORANGO 850G - 18079 - 50%",
+                        19: "DANONE CORPUS 800G MORANGO - 18448 - 50%"
+                    })
+
+                    # -------------------------------- METRIC PRODUTOS -------------------------------- #
+                    
+                    activia_150g_ameixa_17528 = resultado_lista["ACTIVIA 150G AMEIXA - 17528 - 50%"].value_counts().get(1, 0)
+                    porcent_activia_150g_ameixa_17528 = round((activia_150g_ameixa_17528 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    polpa_kids_morango_18157 = resultado_lista["POLPA KIDS MORANGO - 18157 - 50%"].value_counts().get(1, 0)
+                    porcent_polpa_kids_morango_18157 = round((polpa_kids_morango_18157 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    dho_p_levar_morango_17507 = resultado_lista["DHO P/ LEVAR MORANGO - 17507 - 70%"].value_counts().get(1, 0)
+                    porcent_dho_p_levar_morango_17507 = round((dho_p_levar_morango_17507 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danoninho_80g_morango_17506 = resultado_lista["DANONINHO 80G MORANGO - 17506 - 50%"].value_counts().get(1, 0)
+                    porcent_danoninho_80g_morango_17506 = round((danoninho_80g_morango_17506 / st.session_state['dn_danone_vendedor']) * 100, 1)
+#
+                    activia_800g_ameixa_morango_18446_18447 = resultado_lista["ACTIVIA 800G AMEIXA E MORANGO - 18446 / 18447 - 50%"].value_counts().get(1, 0)
+                    porcent_activia_800g_ameixa_morango_18446_18447 = round((activia_800g_ameixa_morango_18446_18447 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danoninho_multi_320g_17462 = resultado_lista["DANONINHO MULTI 320G - 17462 - 50%"].value_counts().get(1, 0)
+                    porcent_danoninho_multi_320g_17462 = round((danoninho_multi_320g_17462 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danoninho_p_beber_100g_morango_17507 = resultado_lista["DANONINHO P/ BEBER 100G MORANGO - 17507 - 50%"].value_counts().get(1, 0)
+                    porcent_danoninho_p_beber_100g_morango_17507 = round((danoninho_p_beber_100g_morango_17507 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danone_vd_170g_morango_17517 = resultado_lista["DANONE VD 170G MORANGO - 17517 - 50%"].value_counts().get(1, 0)
+                    porcent_danone_vd_170g_morango_17517 = round((danone_vd_170g_morango_17517 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danette_sobremesa_choc_90g_18035 = resultado_lista["DANETTE SOBREMESA CHOC 90G - 18035 - 50%"].value_counts().get(1, 0)
+                    porcent_danette_sobremesa_choc_90g_18035 = round((danette_sobremesa_choc_90g_18035 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    yopro_uht_chocolate_17885 = resultado_lista["YOPRO UHT CHOCOLATE - 17885 - 50%"].value_counts().get(1, 0)
+                    porcent_yopro_uht_chocolate_17885 = round((yopro_uht_chocolate_17885 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    yopro_liq_250g_morango_17932 = resultado_lista["YOPRO LIQ 250G MORANGO - 17932 - 50%"].value_counts().get(1, 0)
+                    porcent_yopro_liq_250g_morango_17932 = round((yopro_liq_250g_morango_17932 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danone_morango_850g_18079 = resultado_lista["DANONE MORANGO 850G - 18079 - 50%"].value_counts().get(1, 0)
+                    porcent_danone_morango_850g_18079 = round((danone_morango_850g_18079 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    danone_corpus_800g_morango_18448 = resultado_lista["DANONE CORPUS 800G MORANGO - 18448 - 50%"].value_counts().get(1, 0)
+                    porcent_danone_corpus_800g_morango_18448 = round((danone_corpus_800g_morango_18448 / st.session_state['dn_danone_vendedor']) * 100, 1)
+
+                    color_delta_normal = "normal"
+                    color_delta_inverse = "inverse"
+
+                    left2, center2, right2 = st.columns([1, 1, 1])
+
+                    if porcent_activia_150g_ameixa_17528 >= 50:
+                        left2.metric(label="ACTIVIA 150G AMEIXA - 17528", value=f"{porcent_activia_150g_ameixa_17528}%", delta=f"{activia_150g_ameixa_17528} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:    
+                        left2.metric(label="ACTIVIA 150G AMEIXA - 17528", value=f"{porcent_activia_150g_ameixa_17528}%", delta=f"{activia_150g_ameixa_17528} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_polpa_kids_morango_18157 >= 50:
+                        center2.metric(label="POLPA KIDS MORANGO - 18157", value=f"{porcent_polpa_kids_morango_18157}%", delta=f"{polpa_kids_morango_18157} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        center2.metric(label="POLPA KIDS MORANGO - 18157", value=f"{porcent_polpa_kids_morango_18157}%", delta=f"{polpa_kids_morango_18157} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_dho_p_levar_morango_17507 >= 70:
+                        right2.metric(label="DHO P/ LEVAR MORANGO - 17507", value=f"{porcent_dho_p_levar_morango_17507}%", delta=f"{dho_p_levar_morango_17507} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        right2.metric(label="DHO P/ LEVAR MORANGO - 17507", value=f"{porcent_dho_p_levar_morango_17507}%", delta=f"{dho_p_levar_morango_17507} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danoninho_80g_morango_17506 >= 50:
+                        left2.metric(label="DANONINHO 80G MORANGO - 17506", value=f"{porcent_danoninho_80g_morango_17506}%", delta=f"{danoninho_80g_morango_17506} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        left2.metric(label="DANONINHO 80G MORANGO - 17506", value=f"{porcent_danoninho_80g_morango_17506}%", delta=f"{danoninho_80g_morango_17506} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True) 
+
+                    if porcent_activia_800g_ameixa_morango_18446_18447 >= 50:
+                        center2.metric(label="ACTIVIA 800G AMEIXA E MORANGO - 18446 / 18447", value=f"{porcent_activia_800g_ameixa_morango_18446_18447}%", delta=f"{activia_800g_ameixa_morango_18446_18447} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        center2.metric(label="ACTIVIA 800G AMEIXA E MORANGO - 18446 / 18447", value=f"{porcent_activia_800g_ameixa_morango_18446_18447}%", delta=f"{activia_800g_ameixa_morango_18446_18447} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danoninho_multi_320g_17462 >= 50:
+                        right2.metric(label="DANONINHO MULTI 320G - 17462", value=f"{porcent_danoninho_multi_320g_17462}%", delta=f"{danoninho_multi_320g_17462} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        right2.metric(label="DANONINHO MULTI 320G - 17462", value=f"{porcent_danoninho_multi_320g_17462}%", delta=f"{danoninho_multi_320g_17462} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danoninho_p_beber_100g_morango_17507 >= 50:
+                        left2.metric(label="DANONINHO P/ BEBER 100G MORANGO - 17507", value=f"{porcent_danoninho_p_beber_100g_morango_17507}%", delta=f"{danoninho_p_beber_100g_morango_17507} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        left2.metric(label="DANONINHO P/ BEBER 100G MORANGO - 17507", value=f"{porcent_danoninho_p_beber_100g_morango_17507}%", delta=f"{danoninho_p_beber_100g_morango_17507} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danone_vd_170g_morango_17517 >= 50:
+                        center2.metric(label="DANONE VD 170G MORANGO - 17517", value=f"{porcent_danone_vd_170g_morango_17517}%", delta=f"{danone_vd_170g_morango_17517} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        center2.metric(label="DANONE VD 170G MORANGO - 17517", value=f"{porcent_danone_vd_170g_morango_17517}%", delta=f"{danone_vd_170g_morango_17517} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danette_sobremesa_choc_90g_18035 >= 50:
+                        right2.metric(label="DANETTE SOBREMESA CHOC 90G - 18035", value=f"{porcent_danette_sobremesa_choc_90g_18035}%", delta=f"{danette_sobremesa_choc_90g_18035} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        right2.metric(label="DANETTE SOBREMESA CHOC 90G - 18035", value=f"{porcent_danette_sobremesa_choc_90g_18035}%", delta=f"{danette_sobremesa_choc_90g_18035} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_yopro_uht_chocolate_17885 >= 50:
+                        left2.metric(label="YOPRO UHT CHOCOLATE - 17885", value=f"{porcent_yopro_uht_chocolate_17885}%", delta=f"{yopro_uht_chocolate_17885} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        left2.metric(label="YOPRO UHT CHOCOLATE - 17885", value=f"{porcent_yopro_uht_chocolate_17885}%", delta=f"{yopro_uht_chocolate_17885} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_yopro_liq_250g_morango_17932 >= 50:
+                        center2.metric(label="YOPRO LIQ 250G MORANGO - 17932", value=f"{porcent_yopro_liq_250g_morango_17932}%", delta=f"{yopro_liq_250g_morango_17932} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        center2.metric(label="YOPRO LIQ 250G MORANGO - 17932", value=f"{porcent_yopro_liq_250g_morango_17932}%", delta=f"{yopro_liq_250g_morango_17932} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danone_morango_850g_18079 >= 50:
+                        right2.metric(label="DANONE MORANGO 850G - 18079", value=f"{porcent_danone_morango_850g_18079}%", delta=f"{danone_morango_850g_18079} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        right2.metric(label="DANONE MORANGO 850G - 18079", value=f"{porcent_danone_morango_850g_18079}%", delta=f"{danone_morango_850g_18079} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    if porcent_danone_corpus_800g_morango_18448 >= 50:
+                        center2.metric(label="DANONE CORPUS 800G MORANGO - 18448", value=f"{porcent_danone_corpus_800g_morango_18448}%", delta=f"{danone_corpus_800g_morango_18448} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_normal)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+                    else:
+                        center2.metric(label="DANONE CORPUS 800G MORANGO - 18448", value=f"{porcent_danone_corpus_800g_morango_18448}%", delta=f"{danone_corpus_800g_morango_18448} de {st.session_state['dn_danone_vendedor']} CLIENTES", delta_color=color_delta_inverse)
+                        style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)
+
+                    # --------------------------------------- # --------------------------------------- # 
+                    st.divider()
+                    st.markdown("<br>", unsafe_allow_html=True)
+
+                    mix_posit = resultado_lista["MIX ATENDIDO"].value_counts().get(1, 0)
+
+                    st.session_state['mix_posit_vendedor'] = mix_posit
+
+                    st.session_state['GAP'] = st.session_state['dn_danone_vendedor'] - st.session_state['mix_posit_vendedor']
+
+                    if st.session_state['GAP'] <= 0:
+                        color_delta = "normal"
+                    else:
+                        color_delta = "inverse"
+
+                    right1.metric(label="MIX IDEAL POSITIVADO NO MÊS", value=st.session_state['mix_posit_vendedor'], delta=f"RESTAM {st.session_state['GAP']}", delta_color=color_delta)
+                            
+                    style_metric_cards(background_color="#252d3d", border_size_px=2, border_color="#FFF", border_radius_px=3, border_left_color="#FFF", box_shadow=True)     
+ 
+                    resultado_lista = resultado_lista.drop(columns=["RCA", "VENDEDOR", "CLIENTE", "MIX ATENDIDO"])
+
+                    st.dataframe(resultado_lista, hide_index=True)
 
         # -------------------------------- GERENCIAL -------------------------------- # -------------------------------- #
         with aba2_1:
@@ -3906,155 +4120,6 @@ elif st.session_state['active_tab'] == ':notebook:':
     with tabs[7]:
         with st.spinner('Carregando dados...'): 
             st.divider()
-
-            col_header, col_mm, col_yy = st.columns([1, 0.20, 0.20], gap="small", vertical_alignment="center")
-            col_header.subheader("RANKING DE VENDAS POR REPRESENTANTE", anchor=False)
-            col_mm.selectbox(":calendar: MÊS", ("JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"), index=0, key='mes_7', help="Selecione o mês desejado", placeholder=":calendar: Mês", label_visibility="visible")
-            col_yy.number_input(":calendar: ANO", value=2024, help="Selecione o ano desejado", placeholder=":calendar: Ano", step=1, min_value=2023, max_value=2024, key='ano_7', label_visibility="visible")
-
-            
-            left0, right0 = st.columns([0.6, 1.4], gap="small", vertical_alignment="top")
-                    
-            with left0:
-                container_metric = st.container(border=False)
-                left1, right1 = container_metric.columns([1, 1], gap="small", vertical_alignment="top")
-
-                du = random.randint(19, 22) # diasUteis().values[0][0]
-                dd = random.randint(1, 19) # diasDecorridos().values[0][0]
-                dias_uteis_result = str(du) # str(diasUteis()).split()[-1]
-                dias_decor_result = str(dd) # str(diasDecorridos()).split()[-1]
-                velocidade = dd / du
-                velStr = str(math.floor(velocidade * 100)) 
-                right1.markdown(dias_uteis_result + " DIAS ÚTEIS", unsafe_allow_html=False, help="Quantidade de dias úteis para serem realizadas suas vendas.")
-                right1.markdown(dias_decor_result + " DECORRIDOS", unsafe_allow_html=False, help="Quantidade de dias úteis decorridos no mês.")
-                right1.markdown(velStr + "% - VELOCIDADE", unsafe_allow_html=False, help="Velocidade de vendas realizadas no mês.")
-
-                if (velocidade == 0):
-                    left1.image(path + 'Imagens/0porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0 and velocidade <= 0.10):
-                    left1.image(path + 'Imagens/10porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.10 and velocidade <= 0.20):
-                    left1.image(path + 'Imagens/20porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.20 and velocidade <= 0.30):
-                    left1.image(path + 'Imagens/30porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.30 and velocidade <= 0.40):
-                    left1.image(path + 'Imagens/40porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.40 and velocidade <= 0.50):
-                    left1.image(path + 'Imagens/50porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.50 and velocidade <= 0.60):
-                    left1.image(path + 'Imagens/60porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.60 and velocidade <= 0.70):
-                    left1.image(path + 'Imagens/70porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.70 and velocidade <= 0.80):
-                    left1.image(path + 'Imagens/80porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.80 and velocidade <= 0.90):
-                    left1.image(path + 'Imagens/90porcent.png', width=150, caption='VELOCIDADE')
-                elif (velocidade > 0.90 and velocidade <= 1):
-                    left1.image(path + 'Imagens/100porcent.png', width=150, caption='VELOCIDADE')
-
-
-                with right0:
-                    container_metric = st.container(border=False)
-                    left1, center_left1, center_right1, right1 = container_metric.columns([1, 1, 0.7, 1], gap="small", vertical_alignment="top")
-
-                    # Conteúdo da coluna da esquerda
-                    container_left1 = left1.container(border=True)
-                    meta_total = random.randint(600000, 1000000)
-                    with stylable_container(key="METRIC2",css_styles = cssMetric1):
-                        container_left1.metric(":dart: META", format_number(meta_total))
-
-                    # Conteúdo da coluna central esquerda
-                    container_center_left1 = center_left1.container(border=True)
-                    venda_total = random.randint(1000, 1000000)
-                    with stylable_container(key="METRIC1",css_styles = cssMetric1):
-                        container_center_left1.metric(":moneybag: VENDAS", format_number(venda_total))
-
-                    # Conteúdo da coluna central direita
-                    container_center_right1 = center_right1.container(border=True)
-                    porcent_total = int((venda_total / meta_total) * 100)
-                    with stylable_container(key="METRIC3",css_styles = cssMetric1):
-                        container_center_right1.metric("% META", f"{porcent_total}%")
-
-                    # Conteúdo da coluna da direita
-                    container_right1 = right1.container(border=True)
-                    necessidade = (meta_total - venda_total)
-                    if necessidade < 0:
-                        with stylable_container(key="METRIC4",css_styles = cssMetric1):
-                            necessidade = necessidade * - 1
-                            container_right1.metric(":white_check_mark: SUPERÁVIT", format_number(necessidade))
-                    else:
-                        with stylable_container(key="METRIC4",css_styles = cssMetric1):
-                            container_right1.metric(":warning: GAP", format_number(necessidade))
-
-            st.divider()
-            left2, right2 = st.columns([0.75, 1.25], gap="small", vertical_alignment="top")
-
-            with left2:
-                nomesSup_result_array = np.array(nomesSup_result[1]) # Transformar Uma coluna da tabela para lista
-                sup_dataframe = pd.DataFrame(
-                    {
-                        "name": nomesSup_result_array,
-                        "realizado": [int(venda_total / int(len(nomesSup_result_array))) for _ in range(int(len(nomesSup_result_array)))],
-                        "meta": [int(meta_total / int(len(nomesSup_result_array))) for _ in range(int(len(nomesSup_result_array)))],
-                    }
-                )
-
-                st.write("Vendas vs Meta por Supervisor")
-                st.dataframe(
-                    sup_dataframe,
-                    column_config={
-                        "name": "Supervisor",
-                        "realizado": st.column_config.ProgressColumn(
-                            "Realizado",
-                            help="Porcentagem de vendas realizadas em relação à meta",
-                            width="medium",                            
-                            format ="R$%.0f",
-                            min_value=0,
-                            max_value=int(meta_total / int(len(nomesSup_result_array))),
-                        ),
-                        "meta": st.column_config.NumberColumn(
-                            "Meta",
-                            format ="R$%.0f",
-                            help="Total de vendas esperadas"
-                        ),
-                    },
-                    use_container_width=True,
-                    hide_index=True,
-                )
-
-            with right2:
-                nomesRCA_result_array = np.array([nome for nome in nomesRCA_result[1] if nome not in nomesSup_result_array]) # Transformar Uma coluna da tabela para lista dos nomes que não constam na lista de supervisores
-
-                sup_dataframe = pd.DataFrame(
-                    {
-                        "name": nomesRCA_result_array,
-                        "realizado": [int((venda_total / int(len(nomesSup_result_array))) / int(len(nomesRCA_result_array))) for _ in range(len(nomesRCA_result_array))],
-                        "meta": [int((meta_total / int(len(nomesSup_result_array))) / int(len(nomesRCA_result_array))) for _ in range(len(nomesRCA_result_array))]
-                    }
-                )
-
-                st.write("Vendas vs Meta por Vendedor")
-                st.dataframe(
-                    sup_dataframe,
-                    column_config={
-                        "name": "RCA",
-                        "realizado": st.column_config.ProgressColumn(
-                            "Realizado",
-                            help="Porcentagem de vendas realizadas em relação à meta",
-                            width="medium",
-                            format="R$%.0f", # formartar para moeda com 0 casas decimais
-                            min_value=0,
-                            max_value=int((meta_total / int(len(nomesSup_result_array))) / int(len(nomesRCA_result_array))),
-                        ),
-                        "meta": st.column_config.NumberColumn(
-                            "Meta",
-                            format ="R$%.0f", # formartar para moeda com 0 casas decimais
-                            help="Total de vendas esperadas"
-                        ),
-                    },
-                    hide_index=True,
-                )
-
 
 
 st.markdown("<br> <br> <br> <br>", unsafe_allow_html=True)
