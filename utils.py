@@ -8,6 +8,32 @@ from reportlab.lib.pagesizes import landscape, letter
 from reportlab.pdfgen import canvas
 from babel.numbers import format_currency as babel_format_currency
 
+# ----------------- Função para formatar DataFrame -----------------
+def red_or_green(val):
+    """
+    Função para formatar valores em vermelho ou verde dependendo do valor para dataframe do Mix Ideal
+    """
+    if isinstance(val, str):
+        val = val.replace('%', '')
+        val = float(val)
+    if val >= 50:
+        color = 'green'
+    else:
+        color = 'red'
+    return 'color : {0!s}'.format(color)
+def red_or_green_70(val):
+    """
+    Função para formatar valores em vermelho ou verde dependendo do valor para dataframe do Mix Ideal
+    """
+    if isinstance(val, str):
+        val = val.replace('%', '')
+        val = float(val)
+    if val >= 70:
+        color = 'green'
+    else:
+        color = 'red'
+    return 'color : {0!s}'.format(color)
+
 
 # ----------------- Função para formatar números -----------------
 def format_number(value):
